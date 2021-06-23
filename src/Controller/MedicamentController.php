@@ -67,7 +67,6 @@ class MedicamentController extends AbstractController
      */
     public function add(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
         $medicament = new Medicament();
         $quantiteparjour= $request->get('quantiteparjour');
         $quantitepardose= $request->get('quantitepardose');
@@ -83,8 +82,8 @@ class MedicamentController extends AbstractController
         $medicament->setDure($dure);
         $medicament->setNom($nom);
         $medicament->setFiche($libelle);
-        $em->persist($medicament);
-        $em->flush();
+        $this->entityManager->persist($medicament);
+        $this->entityManager->flush();
         $message = [
             'satus' => 201,
             'message' => 'success'

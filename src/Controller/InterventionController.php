@@ -72,7 +72,6 @@ class InterventionController extends AbstractController
      */
     public function add(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
         $intervention= new Intervention();
         $type= $request->get('type');
         $prix= $request->get('prix');
@@ -84,8 +83,8 @@ class InterventionController extends AbstractController
         $intervention->setType($type);
         $intervention->setPrix($prix);
         $intervention->setFiche($libelle);
-        $em->persist($intervention);
-        $em->flush();
+        $this->entityManager->persist($intervention);
+        $this->entityManager->flush();
         $message = [
             'satus' => 201,
             'message' => 'success'

@@ -62,12 +62,11 @@ class RoleController extends AbstractController
      */
     public function add(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
         $role = new Role();
         $libelle = $request->get('role');
         $role->setRole($libelle);
-        $em->persist($role);
-        $em->flush();
+        $this->entityManager->persist($role);
+        $this->entityManager->flush();
         $message = [
             'satus' => 201,
             'message' => 'success'

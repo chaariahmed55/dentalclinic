@@ -10,8 +10,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=RoleRepository::class)
- * normalizationContext={"groups"={"role","user"}},
- * denormalizationContext={"groups"={"role","user"}}
+ * normalizationContext={"groups"={"role","user","fiche","article","commentaire","rendezvous"}},
+ * denormalizationContext={"groups"={"role","user","fiche","article","commentaire","rendezvous"}}
  * 
  */
 class Role
@@ -20,13 +20,13 @@ class Role
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"role","user"})
+     * @Groups({"role","user","fiche","article","commentaire","rendezvous"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"role","user"})
+     * @Groups({"role","user","fiche","article","commentaire","rendezvous"})
      */
     private $role;
 

@@ -67,14 +67,13 @@ class FicheController extends AbstractController
      */
     public function add(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
         $fiche = new Fiche();
         $date = $request->get('date');
         $description = $request->get('description');
         $fiche->setDate($date);
         $fiche->setDescription($description);
-        $em->persist($fiche);
-        $em->flush();
+        $this->entityManager->persist($fiche);
+        $this->entityManager->flush();
         $message = [
             'satus' => 201,
             'message' => 'success'

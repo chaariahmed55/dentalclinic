@@ -45,6 +45,13 @@ class Fiche
      */
     private $interventions;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="fiche")
+     * @ORM\JoinColumn(nullable=false)
+     * @Groups({"fiche"})
+     */
+    private $user;
+
     public function __construct()
     {
         $this->medicaments = new ArrayCollection();
@@ -136,6 +143,18 @@ class Fiche
                 $intervention->setFiche(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

@@ -12,7 +12,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Serializer
+;
 class UserController extends AbstractController
 {
 
@@ -66,7 +67,6 @@ class UserController extends AbstractController
      */
     public function add(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
         $user = new User();
         $username= $request->get('username');
         $nom= $request->get('nom');
@@ -90,8 +90,8 @@ class UserController extends AbstractController
         $user->setTelephone($telephone);
         $user->setEmail($email);
         $user->setRole($libelle);
-        $em->persist($user);
-        $em->flush();
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
         $message = [
             'satus' => 201,
             'message' => 'success'
