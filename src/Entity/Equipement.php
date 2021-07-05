@@ -12,80 +12,101 @@ class Equipement
 {
     /**
      * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string", length=50)
      */
-    private $id;
+    private $cequipement;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $admissiondate;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $quantityused;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $expirationdate;
+    private $libequipement;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $reference;
+    private $quantite;
 
-    public function getId(): ?int
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $description;
+    
+    /**
+     * Get the value of cequipement
+     */ 
+    public function getcequipement()
     {
-        return $this->id;
+        return $this->cequipement;
     }
 
-    public function getAdmissiondate(): ?string
+    /**
+     * Set the value of cequipement
+     *
+     * @return  self
+     */ 
+    public function setcequipement($cequipement)
     {
-        return $this->admissiondate;
-    }
-
-    public function setAdmissiondate(string $admissiondate): self
-    {
-        $this->admissiondate = $admissiondate;
+        $this->cequipement = $cequipement;
 
         return $this;
     }
 
-    public function getQuantityused(): ?string
+    /**
+     * Get the value of libequipement
+     */ 
+    public function getlibequipement()
     {
-        return $this->quantityused;
+        return $this->libequipement;
     }
 
-    public function setQuantityused(string $quantityused): self
+    /**
+     * Set the value of libequipement
+     *
+     * @return  self
+     */ 
+    public function setlibequipement($libequipement)
     {
-        $this->quantityused = $quantityused;
+        $this->libequipement = $libequipement;
 
         return $this;
     }
 
-    public function getExpirationdate(): ?string
+    /**
+     * Get the value of quantite
+     */ 
+    public function getquantite()
     {
-        return $this->expirationdate;
+        return $this->quantite;
     }
 
-    public function setExpirationdate(string $expirationdate): self
+    /**
+     * Set the value of quantite
+     *
+     * @return  self
+     */ 
+    public function setquantite($quantite)
     {
-        $this->expirationdate = $expirationdate;
+        $this->quantite = $quantite;
 
         return $this;
     }
 
-    public function getReference(): ?int
+    /**
+     * Get the value of description
+     */ 
+    public function getdescription()
     {
-        return $this->reference;
+        return $this->description;
     }
 
-    public function setReference(int $reference): self
+    /**
+     * Set the value of description
+     *
+     * @return  self
+     */ 
+    public function setdescription($description)
     {
-        $this->reference = $reference;
+        $this->description = $description;
 
         return $this;
     }

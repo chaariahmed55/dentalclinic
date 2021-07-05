@@ -10,116 +10,112 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class BonCommandeDetail
 {
+
     /**
      * @ORM\Id
-     * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @ORM\ManyToOne(targetEntity=BonCommande::class)
+     * @ORM\JoinColumn(nullable=false, name="nboncommande", referencedColumnName="nboncommande")
      */
-    private $id;
+    private $nboncommande;
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    private $NBonCommande;
-
-    /**
+     * @ORM\Id
      * @ORM\Column(type="string", length=50)
+     * @ORM\ManyToOne(targetEntity=Equipement::class)
+     * @ORM\JoinColumn(nullable=false, name="cequipement", referencedColumnName="cequipement")
      */
-    private $CEquipement;
+    private $cequipement;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $LibEquipement;
+    private $libequipement;
+
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     */
+    private $ordre;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $Ordre;
+    private $quantite;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="decimal", precision=10, scale=3)
      */
-    private $Quantite;
+    private $prix;
 
-    /**
-     * @ORM\Column(type="float")
-     */
-    private $Prix;
-
-    public function getId(): ?int
+    public function getnboncommande(): ?int
     {
-        return $this->id;
+        return $this->nboncommande;
     }
 
-    public function getNBonCommande(): ?int
+    public function setnboncommande(int $nboncommande): self
     {
-        return $this->NBonCommande;
-    }
-
-    public function setNBonCommande(int $NBonCommande): self
-    {
-        $this->NBonCommande = $NBonCommande;
+        $this->nboncommande = $nboncommande;
 
         return $this;
     }
 
-    public function getCEquipement(): ?string
+    public function getcequipement(): ?string
     {
-        return $this->CEquipement;
+        return $this->cequipement;
     }
 
-    public function setCEquipement(string $CEquipement): self
+    public function setcequipement(string $cequipement): self
     {
-        $this->CEquipement = $CEquipement;
+        $this->cequipement = $cequipement;
 
         return $this;
     }
 
-    public function getLibEquipement(): ?string
+    public function getlibequipement(): ?string
     {
-        return $this->LibEquipement;
+        return $this->libequipement;
     }
 
-    public function setLibEquipement(?string $LibEquipement): self
+    public function setlibequipement(?string $libequipement): self
     {
-        $this->LibEquipement = $LibEquipement;
+        $this->libequipement = $libequipement;
 
         return $this;
     }
 
-    public function getOrdre(): ?int
+    public function getordre(): ?int
     {
-        return $this->Ordre;
+        return $this->ordre;
     }
 
-    public function setOrdre(int $Ordre): self
+    public function setordre(int $ordre): self
     {
-        $this->Ordre = $Ordre;
+        $this->ordre = $ordre;
 
         return $this;
     }
 
-    public function getQuantite(): ?int
+    public function getquantite(): ?int
     {
-        return $this->Quantite;
+        return $this->quantite;
     }
 
-    public function setQuantite(int $Quantite): self
+    public function setquantite(int $quantite): self
     {
-        $this->Quantite = $Quantite;
+        $this->quantite = $quantite;
 
         return $this;
     }
 
-    public function getPrix(): ?float
+    public function getprix(): ?string
     {
-        return $this->Prix;
+        return $this->prix;
     }
 
-    public function setPrix(float $Prix): self
+    public function setprix(string $prix): self
     {
-        $this->Prix = $Prix;
+        $this->prix = $prix;
 
         return $this;
     }
