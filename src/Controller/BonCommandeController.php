@@ -95,7 +95,7 @@ class BonCommandeController extends AbstractController
                     ->setParameter('nb', $nb)
                     ->getQuery();
 
-            $qr= $this->em->createQueryBuilder('BonCommande')
+            $qr= $this->em->createQueryBuilder()
                     ->delete()
                     ->from('App\Entity\BonCommande','b')
                     ->where('b.nboncommande = :nb')

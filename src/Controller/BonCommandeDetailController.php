@@ -60,7 +60,17 @@ class BonCommandeDetailController extends AbstractController
     {
         try
         {
-            $bon = $this->em->getRepository(BonCommandeDetail::class)->find($nb);
+
+            $qb=$this->em->createQueryBuilder()
+                        ->select(['b'])
+                        ->from('App\Entity\BonCommandeDetail','b')
+                        ->where('b.nboncommande = :nb')
+                        ->setParameter('nb',$nb)
+                        ->orderBy('b.ordre')
+                        ->getQuery();
+
+            //$bon = $this->em->getRepository(BonCommandeDetail::class)->findBy($nb);
+            $bon = $qb->getResult();
 
             $jsonbon = $this->serializer->serialize($bon, 'json');
 
@@ -87,8 +97,8 @@ class BonCommandeDetailController extends AbstractController
 
             $qrd= $this->em->createQueryBuilder()
                     ->delete()
-                    ->from('BonCommandeDetail','b')
-                    ->andWhere('b.nboncommande = :nb')
+                    ->from('App\Entity\BonCommandeDetail','b')
+                    ->where('b.nboncommande = :nb')
                     ->andWhere('b.cequipement = :ce')
                     ->andWhere('b.ordre = :or')
                     ->setParameter('nb', $nb)
