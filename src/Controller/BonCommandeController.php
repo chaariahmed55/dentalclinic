@@ -171,7 +171,7 @@ class BonCommandeController extends AbstractController
             $details = $bon->getdetail();
 
             $bonc = new BonCommande();
-            $bonc = $this->serializer->deserialize($this->serializer->serialize($entete, 'json'), BonCommande::class, 'json', [AbstractNormalizer::IGNORED_ATTRIBUTES => ['age']]);
+            $bonc = $this->serializer->deserialize($this->serializer->serialize($entete, 'json'), BonCommande::class, 'json', [AbstractNormalizer::IGNORED_ATTRIBUTES => ['nboncommande','dateboncommande']]);
             $bonc->setdateboncommande( (new \DateTime('now')));
             $this->em->getConnection()->beginTransaction();
 

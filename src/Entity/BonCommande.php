@@ -57,7 +57,7 @@ class BonCommande
         return $this->dateboncommande;
     }
 
-    public function setdateboncommande(?\DateTimeInterface $dateboncommande): self
+    public function setdateboncommande(\DateTimeInterface $dateboncommande): self
     {
         $this->dateboncommande = $dateboncommande;
 
