@@ -16,6 +16,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 
 class BonCommandeDetailController extends AbstractController
 {
@@ -27,7 +28,7 @@ class BonCommandeDetailController extends AbstractController
         )
     {
         $this->em = $em;
-        $this->serializer = new Serializer(array(new ObjectNormalizer()), array(new JsonEncoder()));
+        $this->serializer = new Serializer(array(new DateTimeNormalizer(), new ObjectNormalizer()), array(new JsonEncoder()));
     }
 
     /**
@@ -60,7 +61,6 @@ class BonCommandeDetailController extends AbstractController
     {
         try
         {
-
             $qb=$this->em->createQueryBuilder()
                         ->select(['b'])
                         ->from('App\Entity\BonCommandeDetail','b')

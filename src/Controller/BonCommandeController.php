@@ -18,6 +18,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 
 class BonCommandeController extends AbstractController
 {
@@ -30,7 +31,7 @@ class BonCommandeController extends AbstractController
         )
     {
         $this->em = $em;
-        $this->serializer = new Serializer(array(new ObjectNormalizer()), array(new JsonEncoder()));
+        $this->serializer = new Serializer(array(new DateTimeNormalizer('d-m-Y'), new ObjectNormalizer()), array(new JsonEncoder()));
     }
 
     /**
