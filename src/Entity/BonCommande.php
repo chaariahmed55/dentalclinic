@@ -19,8 +19,6 @@ class BonCommande
     private $nboncommande;
 
     /**
-     * @Assert\DateTime
-    //  * @var string A "Y-m-d H:i:s" formatted value
      * @ORM\Column(type="date")
      */
     private $dateboncommande;
@@ -39,6 +37,16 @@ class BonCommande
      * @ORM\Column(type="decimal", precision=10, scale=3)
      */
     private $montant;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $etat;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default":false})
+     */
+    private $bvalid;
 
     public function getnboncommande(): ?int
     {
@@ -96,6 +104,30 @@ class BonCommande
     public function setmontant(string $montant): self
     {
         $this->montant = $montant;
+
+        return $this;
+    }
+
+    public function getetat(): ?string
+    {
+        return $this->etat;
+    }
+
+    public function setetat(string $etat): self
+    {
+        $this->etat = $etat;
+
+        return $this;
+    }
+
+    public function getbvalid(): ?bool
+    {
+        return $this->bvalid;
+    }
+
+    public function setbvalid(bool $bvalid): self
+    {
+        $this->bvalid = $bvalid;
 
         return $this;
     }

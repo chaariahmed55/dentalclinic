@@ -32,6 +32,16 @@ class Equipement
     private $description;
     
     /**
+     * @ORM\Column(type="date", nullable=true)
+     */
+    private $date;
+
+    /**
+     * @ORM\Column(type="string", length=500, nullable=true)
+     */
+    private $imageurl;
+
+    /**
      * Get the value of cequipement
      */ 
     public function getcequipement()
@@ -107,6 +117,30 @@ class Equipement
     public function setdescription($description)
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getdate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    public function setdate(?\DateTimeInterface $date): self
+    {
+        $this->date = $date;
+
+        return $this;
+    }
+
+    public function getimageurl(): ?string
+    {
+        return $this->imageurl;
+    }
+
+    public function setimageurl(?string $imageurl): self
+    {
+        $this->imageurl = $imageurl;
 
         return $this;
     }
