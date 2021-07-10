@@ -29,7 +29,7 @@ class EquipementController extends AbstractController
         )
     {
         $this->em = $em;
-        $this->serializer = new Serializer(array(new DateTimeNormalizer('d-m-Y'), new ObjectNormalizer()), array(new JsonEncoder()));
+        $this->serializer = new Serializer(array(new DateTimeNormalizer('d/m/Y'), new ObjectNormalizer()), array(new JsonEncoder()));
     }
 
     /**

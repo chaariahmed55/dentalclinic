@@ -31,7 +31,7 @@ class BonCommandeController extends AbstractController
         )
     {
         $this->em = $em;
-        $this->serializer = new Serializer(array(new DateTimeNormalizer('d-m-Y'), new ObjectNormalizer()), array(new JsonEncoder()));
+        $this->serializer = new Serializer(array(new DateTimeNormalizer('d/m/Y'), new ObjectNormalizer()), array(new JsonEncoder()));
     }
 
     /**
@@ -41,7 +41,15 @@ class BonCommandeController extends AbstractController
     {
         try
         {
-            $bon = $this->em->getRepository(BonCommande::class)->findAll();
+            //$bon = $this->em->getRepository(BonCommande::class)->findAll();
+
+            $qb=$this->em->createQueryBuilder()
+                ->select('b')
+                ->from('App\Entity\BonCommande','b')
+                ->orderBy('b.nboncommande','DESC')
+                ->getQuery();
+
+            $bon = $qb->getResult();
 
             $jsonbon = $this->serializer->serialize($bon, 'json');
 
@@ -53,7 +61,7 @@ class BonCommandeController extends AbstractController
         }
         
         return $this->json(
-            json_decode(Utils::jresponce('OK','Fetch', $jsonbon), true)
+            json_decode(Utils::jresponce('OK','Fetchby', $jsonbon), true)
         );
     }
 
@@ -64,7 +72,17 @@ class BonCommandeController extends AbstractController
     {
         try
         {
-            $bon = $this->em->getRepository(BonCommande::class)->find($nb);
+            //$bon = $this->em->getRepository(BonCommande::class)->find($nb);
+
+            $qb=$this->em->createQueryBuilder()
+                ->select(['b'])
+                ->from('App\Entity\BonCommande','b')
+                ->where('b.nboncommande = :nb')
+                ->setParameter('nb',$nb)
+                ->orderBy('b.nboncommande','DESC')
+                ->getQuery();
+
+            $bon = $qb->getResult();
 
             $jsonbon = $this->serializer->serialize($bon, 'json');
 
@@ -162,6 +180,8 @@ class BonCommandeController extends AbstractController
     {
         try
         {
+            $this->em->getConnection()->beginTransaction();
+
             //retrieve post Body
             $data = $request->getContent();
 
@@ -172,9 +192,8 @@ class BonCommandeController extends AbstractController
             $details = $bon->getdetail();
 
             $bonc = new BonCommande();
-            $bonc = $this->serializer->deserialize($this->serializer->serialize($entete, 'json'), BonCommande::class, 'json', [AbstractNormalizer::IGNORED_ATTRIBUTES => ['nboncommande','dateboncommande']]);
-            $bonc->setdateboncommande( (new \DateTime('now')));
-            $this->em->getConnection()->beginTransaction();
+            $bonc = $this->serializer->deserialize($this->serializer->serialize($entete, 'json'), BonCommande::class, 'json', [AbstractNormalizer::IGNORED_ATTRIBUTES => ['nboncommande']]);
+            //$bonc->setdateboncommande( (new \DateTime('now')));
 
             //db call
             $this->em->persist($bonc);
@@ -184,7 +203,7 @@ class BonCommandeController extends AbstractController
                 $bdetai = new BonCommandeDetail();
                 $bdetai = $this->serializer->deserialize($this->serializer->serialize($detail, 'json'), BonCommandeDetail::class, 'json');
                 $bdetai->setnboncommande($bonc->getnboncommande());
-                $bdetai->setordre($index+1);
+                //$bdetai->setordre($index+1);
                 $this->em->persist($bdetai);
             }
 
