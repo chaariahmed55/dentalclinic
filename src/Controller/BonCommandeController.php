@@ -13,6 +13,8 @@ use App\Entity\BonCommande;
 use App\Entity\BonCommandeDetail;
 use App\Utils\BCBody;
 use App\Utils\Utils;
+use DateTimeZone;
+use Exception;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -46,6 +48,7 @@ class BonCommandeController extends AbstractController
             $qb=$this->em->createQueryBuilder()
                 ->select('b')
                 ->from('App\Entity\BonCommande','b')
+                ->where('b.etat != \'ANNULER\'')
                 ->orderBy('b.nboncommande','DESC')
                 ->getQuery();
 
@@ -56,7 +59,7 @@ class BonCommandeController extends AbstractController
         }catch(\Exception $e)
         {
             return $this->json(
-                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "[]"), true)
+                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "false"), true)
             );
         }
         
@@ -66,20 +69,24 @@ class BonCommandeController extends AbstractController
     }
 
     /**
-     * @Route("/boncommande/getby/{nb}", name="get_boncommande", methods={"GET"})
+     * @Route("/boncommande/range/{dd}/{df}", name="range_boncommande", methods={"GET"})
      */
-    public function fetchby($nb)
+    public function range($dd, $df)
     {
         try
         {
-            //$bon = $this->em->getRepository(BonCommande::class)->find($nb);
+            // $dd = \DateTime::createFromFormat("d-m-Y",  $dd, new DateTimeZone('Africa/Tunis'));
+            // $df = \DateTime::createFromFormat("d-m-Y",  $df, new DateTimeZone('Africa/Tunis'));
+            //$bon = $this->em->getRepository(BonCommande::class)->findAll();
 
             $qb=$this->em->createQueryBuilder()
-                ->select(['b'])
+                ->select('b')
                 ->from('App\Entity\BonCommande','b')
-                ->where('b.nboncommande = :nb')
-                ->setParameter('nb',$nb)
+                ->where('b.etat != \'ANNULER\'')
+                ->andWhere('b.dateboncommande between :dd and :df')
                 ->orderBy('b.nboncommande','DESC')
+                ->setParameter(':dd', $dd)
+                ->setParameter(':df', $df)
                 ->getQuery();
 
             $bon = $qb->getResult();
@@ -89,12 +96,84 @@ class BonCommandeController extends AbstractController
         }catch(\Exception $e)
         {
             return $this->json(
-                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "[]"), true)
+                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "false"), true)
             );
         }
         
         return $this->json(
-            json_decode(Utils::jresponce('OK','Fetch', $jsonbon), true)
+            json_decode(Utils::jresponce('OK','Fetchby', $jsonbon), true)
+        );
+    }
+
+    /**
+     * @Route("/boncommande/fetchby/{nb}", name="get_boncommande", methods={"GET"})
+     */
+    public function fetchby($nb)
+    {
+        try
+        {
+            //$bon = $this->em->getRepository(BonCommande::class)->find($nb);
+
+            $bcbody = new BCBody();
+
+            //fetch entete
+            $qbe=$this->em->createQueryBuilder()
+                ->select(['b'])
+                ->from('App\Entity\BonCommande','b')
+                ->where('b.nboncommande = :nb')
+                ->andWhere('b.etat != \'ANNULER\'')
+                ->setParameter('nb',$nb)
+                ->getQuery();
+
+            $bonen = $qbe->getSingleResult();
+
+            //$jsonentete = $this->serializer->serialize($bonen, 'json');
+
+            $bcbody->setentete($bonen);
+
+            //fetch detail
+            $qbd=$this->em->createQueryBuilder()
+                        ->select(['b'])
+                        ->from('App\Entity\BonCommandeDetail','b')
+                        ->where('b.nboncommande = :nb')
+                        ->setParameter('nb',$nb)
+                        ->orderBy('b.ordre')
+                        ->getQuery();
+
+            //$bon = $this->em->getRepository(BonCommandeDetail::class)->findBy($nb);
+            $bondet = $qbd->getResult();
+
+            //$jsondetail = $this->serializer->serialize($bondet, 'json');
+
+            foreach ($bondet as $index => $detail) {
+                $detail->setprix($detail->getprix());
+            }
+
+            $bcbody->setdetail($bondet);
+
+            $jsonbcbody = $this->serializer->serialize($bcbody, 'json');
+
+        }catch(\Doctrine\ORM\NonUniqueResultException $e)
+        {
+            return $this->json(
+                json_decode(Utils::jresponce('OK', $e->getMessage(), "false"), true)
+            );
+        }
+        catch(\Doctrine\ORM\NoResultException $e)
+        {
+            return $this->json(
+                json_decode(Utils::jresponce('OK', $e->getMessage(), "false"), true)
+            );
+        }
+        catch(\Exception $e)
+        {
+            return $this->json(
+                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "false"), true)
+            );
+        }
+        
+        return $this->json(
+            json_decode(Utils::jresponce('OK','Fetch', $jsonbcbody), true)
         );
     }
 
@@ -130,12 +209,12 @@ class BonCommandeController extends AbstractController
         {
             $this->em->getConnection()->rollBack();
             return $this->json(
-                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "[]"), true)
+                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "false"), true)
             );
         }
         
         return $this->json(
-            json_decode(Utils::jresponce('OK','DONE', "[]"), true)
+            json_decode(Utils::jresponce('OK','DONE', "false"), true)
         );
     }
 
@@ -162,19 +241,19 @@ class BonCommandeController extends AbstractController
         }catch(\Exception $e)
         {
             return $this->json(
-                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "[]"), true)
+                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "false"), true)
             );
         }
         
         return $this->json(
-            json_decode(Utils::jresponce('OK','DONE', "[]"), true)
+            json_decode(Utils::jresponce('OK','DONE', "false"), true)
         );
     }
 
     /**
-     * @Route("/boncommande/new", name="new_boncommande", methods={"POST"})
+     * @Route("/boncommande/save", name="save_boncommande", methods={"POST"})
      */
-    public function add(
+    public function save(
         Request $request
         )
     {
@@ -192,8 +271,37 @@ class BonCommandeController extends AbstractController
             $details = $bon->getdetail();
 
             $bonc = new BonCommande();
-            $bonc = $this->serializer->deserialize($this->serializer->serialize($entete, 'json'), BonCommande::class, 'json', [AbstractNormalizer::IGNORED_ATTRIBUTES => ['nboncommande']]);
+            $bonc = $this->serializer->deserialize($this->serializer->serialize($entete, 'json'), BonCommande::class, 'json'); //[AbstractNormalizer::IGNORED_ATTRIBUTES => ['nboncommande']]
             //$bonc->setdateboncommande( (new \DateTime('now')));
+
+            $clonebonc = clone $bonc; 
+
+            $findbon= $this->em->getRepository(BonCommande::class)->find($bonc->getnboncommande());
+            if($findbon){
+                if($findbon->getetat()!=="EN ATTENTE")
+                {
+                   throw new Exception('Enregistrement echoué.');
+                }
+                $bonc = $findbon;
+                $bonc->setdateboncommandedate($clonebonc->getdateboncommande()); 
+                $bonc->setcfournisseur($clonebonc->getcfournisseur()); 
+                $bonc->setraisonsocialefournisseur($clonebonc->getraisonsocialefournisseur()); 
+                $bonc->setmontant($clonebonc->getmontant()); 
+                $bonc->setetat($clonebonc->getetat()); 
+                $bonc->setbvalid($clonebonc->getbvalid());
+
+                //delete details
+                $qrd= $this->em->createQueryBuilder()
+                    ->delete()
+                    ->from('App\Entity\BonCommandeDetail','b')
+                    ->where('b.nboncommande = :nb')
+                    ->setParameter('nb', $bonc->getnboncommande())
+                    ->getQuery();
+            
+                $qrd->execute();
+            }else{
+                $bonc->setnboncommande(NULL);
+            }
 
             //db call
             $this->em->persist($bonc);
@@ -216,12 +324,49 @@ class BonCommandeController extends AbstractController
             $this->em->getConnection()->rollBack();
 
             return $this->json(
-                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "[]"), true)
+                json_decode(Utils::jresponce('ERROR', $e->getMessage()." TRACE ".$e->getTraceAsString() , "false"), true)
             );
         }
         
         return $this->json(
-            json_decode(Utils::jresponce('OK','DONE', "[]"), true)
+            json_decode(Utils::jresponce('OK','DONE', "false"), true)
+        );
+    }
+
+        /**
+     * @Route("/boncommande/annuler/{nb}", name="annuler_boncommande", methods={"GET"})
+     */
+    public function annuler($nb)
+    {
+        try
+        {
+            $this->em->getConnection()->beginTransaction();
+
+            $findbon= $this->em->getRepository(BonCommande::class)->find($nb);
+            if($findbon){
+                
+                if($findbon->getetat()==="VALIDER")
+                    throw new Exception('INTERDIT');
+
+                $findbon->setetat('ANNULER');
+                //db call
+                $this->em->persist($findbon);
+                $this->em->flush();    
+            }      
+
+            $this->em->getConnection()->commit();
+
+        }catch(\Exception $e)
+        {
+            $this->em->getConnection()->rollBack();
+
+            return $this->json(
+                json_decode(Utils::jresponce('ERROR', $e->getMessage()." TRACE ".$e->getTraceAsString() , "false"), true)
+            );
+        }
+        
+        return $this->json(
+            json_decode(Utils::jresponce('OK','DONE', "false"), true)
         );
     }
 

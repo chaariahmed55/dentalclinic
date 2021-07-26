@@ -54,7 +54,7 @@ class EquipementController extends AbstractController
         }catch(\Exception $e)
         {
             return $this->json(
-                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "[]"), true)
+                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "false"), true)
             );
         }
         
@@ -87,7 +87,7 @@ class EquipementController extends AbstractController
         }catch(\Exception $e)
         {
             return $this->json(
-                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "[]"), true)
+                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "false"), true)
             );
         }
         
@@ -124,6 +124,7 @@ class EquipementController extends AbstractController
             }
 
             if(!str_starts_with($equips->getimageurl(), $equips->getcequipement())){        
+               
                 $image = Utils::uploadimage(
                     $this->getParameter('kernel.project_dir'), 
                     $equips->getimageurl(),
@@ -145,12 +146,12 @@ class EquipementController extends AbstractController
         }catch(\Exception $e)
         {
             return $this->json(
-                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "[]"), true)
+                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "false"), true)
             );
         }
         
         return $this->json(
-            json_decode(Utils::jresponce('OK','DONE', "[]"), true)
+            json_decode(Utils::jresponce('OK','DONE', "false"), true)
         );
     }
 
@@ -174,7 +175,7 @@ class EquipementController extends AbstractController
 
             if(count($bon) > 0){
                 return $this->json(
-                    json_decode(Utils::jresponce('NOTOK','EXISTS', "[]"), true)
+                    json_decode(Utils::jresponce('NOTOK','EXISTS', "false"), true)
                 );
             }
 
@@ -193,12 +194,12 @@ class EquipementController extends AbstractController
         {
             $this->em->getConnection()->rollBack();
             return $this->json(
-                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "[]"), true)
+                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "false"), true)
             );
         }
         
         return $this->json(
-            json_decode(Utils::jresponce('OK','DONE', "[]"), true)
+            json_decode(Utils::jresponce('OK','DONE', "false"), true)
         );
     }
 
@@ -260,7 +261,7 @@ class EquipementController extends AbstractController
         }catch(\Exception $e)
         {
             return $this->json(
-                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "[]"), true)
+                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "false"), true)
             );
         }
         
@@ -293,7 +294,7 @@ class EquipementController extends AbstractController
         }catch(\Exception $e)
         {
             return $this->json(
-                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "[]"), true)
+                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "false"), true)
             );
         }
         

@@ -108,12 +108,12 @@ class BonCommandeDetail
         return $this;
     }
 
-    public function getprix(): ?string
+    public function getprix(): ?float
     {
-        return $this->prix;
+        return (float)$this->prix;
     }
 
-    public function setprix(string $prix): self
+    public function setprix($prix): self
     {
         $this->prix = $prix;
 

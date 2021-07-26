@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\BonCommandeRepository;
+use DateTimeZone;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -53,21 +54,28 @@ class BonCommande
         return $this->nboncommande;
     }
 
-    // public function setnboncommande(?int $nboncommande): self
-    // {
-    //     $this->nboncommande = $nboncommande;
+    public function setnboncommande($nboncommande): self
+    {
+        $this->nboncommande = $nboncommande;
 
-    //     return $this;
-    // }
+        return $this;
+    }
 
-    public function getdateboncommande(): ?\DateTimeInterface
+    public function getdateboncommande()
     {
         return $this->dateboncommande;
     }
 
-    public function setdateboncommande(\DateTimeInterface $dateboncommande): self
+    public function setdateboncommande($dateboncommande): self
     {
-        $this->dateboncommande = $dateboncommande;
+        $this->dateboncommande =  \DateTime::createFromFormat("d/m/Y",  $dateboncommande,new DateTimeZone('Africa/Tunis'));
+
+        return $this;
+    }
+
+    public function setdateboncommandedate($dateboncommande): self
+    {
+        $this->dateboncommande =  $dateboncommande;
 
         return $this;
     }
@@ -96,19 +104,19 @@ class BonCommande
         return $this;
     }
 
-    public function getmontant(): ?string
+    public function getmontant(): ?float
     {
-        return $this->montant;
+        return floatval($this->montant);
     }
 
-    public function setmontant(string $montant): self
+    public function setmontant($montant): self
     {
         $this->montant = $montant;
 
         return $this;
     }
 
-    public function getetat(): ?string
+    public function getetat()
     {
         return $this->etat;
     }

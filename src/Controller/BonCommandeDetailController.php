@@ -45,7 +45,7 @@ class BonCommandeDetailController extends AbstractController
         }catch(\Exception $e)
         {
             return $this->json(
-                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "[]"), true)
+                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "false"), true)
             );
         }
         
@@ -55,7 +55,7 @@ class BonCommandeDetailController extends AbstractController
     }
 
     /**
-     * @Route("/boncommandedetail/getby/{nb}", name="get_boncommandedetail", methods={"GET"})
+     * @Route("/boncommandedetail/fetchby/{nb}", name="fetch_boncommandedetail", methods={"GET"})
      */
     public function fetchby($nb)
     {
@@ -77,7 +77,7 @@ class BonCommandeDetailController extends AbstractController
         }catch(\Exception $e)
         {
             return $this->json(
-                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "[]"), true)
+                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "false"), true)
             );
         }
         
@@ -114,12 +114,12 @@ class BonCommandeDetailController extends AbstractController
         {
             $this->em->getConnection()->rollBack();
             return $this->json(
-                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "[]"), true)
+                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "false"), true)
             );
         }
         
         return $this->json(
-            json_decode(Utils::jresponce('OK','DONE', "[]"), true)
+            json_decode(Utils::jresponce('OK','DONE', "false"), true)
         );
     }
 
@@ -146,12 +146,12 @@ class BonCommandeDetailController extends AbstractController
         }catch(\Exception $e)
         {
             return $this->json(
-                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "[]"), true)
+                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "false"), true)
             );
         }
         
         return $this->json(
-            json_decode(Utils::jresponce('OK','DONE', "[]"), true)
+            json_decode(Utils::jresponce('OK','DONE', "false"), true)
         );
     }
 }
