@@ -12,6 +12,8 @@ use App\Entity\Equipement;
 use App\Entity\BonCommande;
 use App\Entity\BonCommandeDetail;
 use App\Utils\BCBody;
+use App\Utils\BCLineChart;
+use App\Utils\BCRange;
 use App\Utils\Utils;
 use DateTimeZone;
 use Exception;
@@ -78,6 +80,21 @@ class BonCommandeController extends AbstractController
             // $dd = \DateTime::createFromFormat("d-m-Y",  $dd, new DateTimeZone('Africa/Tunis'));
             // $df = \DateTime::createFromFormat("d-m-Y",  $df, new DateTimeZone('Africa/Tunis'));
             //$bon = $this->em->getRepository(BonCommande::class)->findAll();
+            $bcrange = new BCRange();
+
+            $qbh=$this->em->createQueryBuilder()
+                ->select('b.etat as etat, count(b) as count')
+                ->from('App\Entity\BonCommande','b')
+                ->where('b.dateboncommande between :dd and :df')
+                ->orderBy('b.nboncommande','DESC')
+                ->groupBy('b.etat')
+                ->setParameter(':dd', $dd)
+                ->setParameter(':df', $df)
+                ->getQuery();
+
+            $bonh = $qbh->getResult();
+
+            $bcrange->setHead($bonh);
 
             $qb=$this->em->createQueryBuilder()
                 ->select('b')
@@ -91,7 +108,9 @@ class BonCommandeController extends AbstractController
 
             $bon = $qb->getResult();
 
-            $jsonbon = $this->serializer->serialize($bon, 'json');
+            $bcrange->setBody($bon);
+
+            $jsonbon = $this->serializer->serialize($bcrange, 'json');
 
         }catch(\Exception $e)
         {
@@ -367,6 +386,47 @@ class BonCommandeController extends AbstractController
         
         return $this->json(
             json_decode(Utils::jresponce('OK','DONE', "false"), true)
+        );
+    }
+
+    /**
+     * @Route("/boncommande/linechart", name="linechart_boncommande", methods={"GET"})
+     */
+    public function linechart()
+    {
+        try
+        {
+            $bcline = array();
+
+            $qbh=$this->em->createQueryBuilder()
+                ->select('month(b.dateboncommande) as mn, sum(b.montant) as sum')
+                ->from('App\Entity\BonCommande','b')
+                ->where('month(b.dateboncommande) <= month(now())')
+                ->groupBy('mn')
+                ->orderBy('month(b.dateboncommande)','DESC')
+                ->getQuery();
+
+            $lines = $qbh->getResult();
+
+            foreach($lines as $val){
+                $l = new BCLineChart();
+                $l->setMn($val['mn']);
+                $l->setSum($val['sum']);
+                
+                array_push($bcline, $l);
+            }
+
+            $jsonbon = $this->serializer->serialize($bcline, 'json');
+
+        }catch(\Exception $e)
+        {
+            return $this->json(
+                json_decode(Utils::jresponce('ERROR', $e->getMessage(), "false"), true)
+            );
+        }
+        
+        return $this->json(
+            json_decode(Utils::jresponce('OK','Fetchby', $jsonbon), true)
         );
     }
 
