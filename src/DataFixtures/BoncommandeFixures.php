@@ -90,6 +90,7 @@ class BoncommandeFixures extends Fixture
             $manager->flush();
         }
 
+        #endregion
 
     }
 
