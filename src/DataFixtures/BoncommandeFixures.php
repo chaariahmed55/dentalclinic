@@ -33,6 +33,7 @@ class BoncommandeFixures extends Fixture
             $equips->setquantite( mt_rand(1, 100));
             $equips->setdescription($randstring.' On sait depuis longtemps que travailler avec du texte lisible et contenant du sens est source de distractions.');
             $equips->setimageurl('');
+            $equips->setdate( (new \DateTime('now')));
             $manager->persist($equips);
         }
 
