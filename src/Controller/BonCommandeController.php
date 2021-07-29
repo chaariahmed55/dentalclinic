@@ -332,6 +332,15 @@ class BonCommandeController extends AbstractController
                 $bdetai->setnboncommande($bonc->getnboncommande());
                 //$bdetai->setordre($index+1);
                 $this->em->persist($bdetai);
+                
+                //BC valider augmente le stock
+                if($bonc->getbvalid()){
+                    $equip = new Equipement();
+                    $equip =  $this->em->getRepository(Equipement::class)->find($bdetai->getcequipement());
+                    $equip->setquantite($equip->getquantite() + $bdetai->getquantite());
+                    $this->em->persist($equip);
+                    $this->em->flush();
+                }
             }
 
             $this->em->flush();            
