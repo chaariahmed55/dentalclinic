@@ -34,7 +34,7 @@ class MedicamentController extends AbstractController
         ]);
     }
 
-/**
+    /**
      * @Route("/getallmedicaments" , name="getallmedicaments")
      */
     public function getallmedicaments()
@@ -49,6 +49,19 @@ class MedicamentController extends AbstractController
     }
 
 
+        /**
+     * @Route("/medicament/get/{id}" , name="getmedicamentbyidfiche")
+     */
+    public function getmedicamentbyidfiche($id)
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $medicament = $this->getDoctrine()->getManager()->getRepository(Medicament::class)->findOneBy(['fiche' => $id]);
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
+        $serializer = new Serializer([$normalizer]);
+        $data = $serializer->normalize($medicament, null, ['groups' =>
+            'medicament']);
+        return $this->json($data, 200);
+    }
 
     /**
      * @Route("/medicament/delete/{id}", name="delete_medicament", methods={"POST"})
@@ -99,23 +112,14 @@ class MedicamentController extends AbstractController
     public function update(Request $request, $id)
     {
         $medicament = $this->getDoctrine()->getManager()->getRepository(Medicament::class)->findOneBy(['id'=>$id]);
-
         $quantiteparjour= $request->get('quantiteparjour');
         $quantitepardose= $request->get('quantitepardose');
         $dure= $request->get('dure');
         $nom= $request->get('nom');
-        $fiche= $request->get('fiche');
-        $libelle = $this->getDoctrine()->getManager()->getRepository(Fiche::class)->findOneBy(['id'=>$fiche]);
-        if(!$libelle){
-            return $this->json('error',400);
-        }
-        // dump($quantiteparjour);die;
         $medicament->setQuantiteparjour($quantiteparjour);
         $medicament->setQuantitepardose($quantitepardose);
         $medicament->setDure($dure);
         $medicament->setNom($nom);
-        $medicament->setFiche($libelle);
-        
         $this->entityManager->persist($medicament);
         $this->entityManager->flush();
         return $this->json('success',200);

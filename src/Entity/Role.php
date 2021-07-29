@@ -33,11 +33,13 @@ class Role
     /**
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="role", orphanRemoval=true)
      */
-    private $user;
+    private $users;
+
 
     public function __construct()
     {
         $this->user = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -58,26 +60,26 @@ class Role
     }
 
     /**
-     * @return Collection|user[]
+     * @return Collection|User[]
      */
-    public function getUser(): Collection
+    public function getUsers(): Collection
     {
-        return $this->user;
+        return $this->users;
     }
 
-    public function addUser(user $user): self
+    public function addUser(User $user): self
     {
-        if (!$this->user->contains($user)) {
-            $this->user[] = $user;
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
             $user->setRole($this);
         }
 
         return $this;
     }
 
-    public function removeUser(user $user): self
+    public function removeUser(User $user): self
     {
-        if ($this->user->removeElement($user)) {
+        if ($this->users->removeElement($user)) {
             // set the owning side to null (unless already changed)
             if ($user->getRole() === $this) {
                 $user->setRole(null);
@@ -86,4 +88,6 @@ class Role
 
         return $this;
     }
+
+    
 }

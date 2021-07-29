@@ -49,16 +49,18 @@ class Article
 
     /**
      * @ORM\OneToMany(targetEntity=Commentaire::class, mappedBy="article", orphanRemoval=true)
+     * 
      */
     private $comment;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="articles")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="article")
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"article","commentaire"})
      */
     private $user;
 
+    
     public function __construct()
     {
         $this->comment = new ArrayCollection();
@@ -147,15 +149,17 @@ class Article
         return $this;
     }
 
-    public function getUser(): ?user
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(?user $user): self
+    public function setUser(?User $user): self
     {
         $this->user = $user;
 
         return $this;
     }
+
+    
 }

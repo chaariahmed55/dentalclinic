@@ -6,17 +6,15 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
-
-
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * normalizationContext={"groups"={"user","fiche","article","commentaire","rendezvous"}},
  * denormalizationContext={"groups"={"user","fiche","article","commentaire","rendezvous"}}
- *
  */
-class User
+class User implements UserInterface
 {
     /**
      * @ORM\Id
@@ -27,10 +25,23 @@ class User
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=180, unique=true)
      * @Groups({"user","fiche","article","commentaire","rendezvous"})
      */
     private $username;
+
+    /**
+     * @ORM\Column(type="json")
+     * @Groups({"user","fiche","article","commentaire","rendezvous"})
+     */
+    private $roles = [];
+
+    /**
+     * @var string The hashed password
+     * @ORM\Column(type="string")
+     * @Groups({"user","fiche","article","commentaire","rendezvous"})
+     */
+    private $password;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -43,12 +54,6 @@ class User
      * @Groups({"user","fiche","article","commentaire","rendezvous"})
      */
     private $prenom;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"user","fiche","article","commentaire","rendezvous"})
-     */
-    private $mdp;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -75,32 +80,33 @@ class User
     private $email;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Role::class, inversedBy="user")
-     * @ORM\JoinColumn(nullable=false)
-     * @Groups({"user","fiche","article","commentaire","rendezvous"})
-     */
-    private $role;
-
-    /**
      * @ORM\OneToMany(targetEntity=Fiche::class, mappedBy="user", orphanRemoval=true)
      */
     private $fiche;
 
     /**
-     * @ORM\OneToMany(targetEntity=Article::class, mappedBy="user", orphanRemoval=true)
-     */
-    private $articles;
-
-    /**
      * @ORM\OneToMany(targetEntity=Rendezvous::class, mappedBy="user", orphanRemoval=true)
      */
-    private $rendezvouses;
+    private $rendezvous;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Article::class, mappedBy="user", orphanRemoval=true)
+     */
+    private $article;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Role::class, inversedBy="users")
+     * @ORM\JoinColumn(nullable=false)
+     * @Groups({"user","fiche","article","commentaire","rendezvous"})
+     */
+    private $role;
 
     public function __construct()
     {
         $this->fiche = new ArrayCollection();
-        $this->articles = new ArrayCollection();
-        $this->rendezvouses = new ArrayCollection();
+        $this->rendezvous = new ArrayCollection();
+        $this->article = new ArrayCollection();
+        $this->roles = array('ROLE_USER');
     }
 
     public function getId(): ?int
@@ -108,9 +114,14 @@ class User
         return $this->id;
     }
 
-    public function getUsername(): ?string
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUsername(): string
     {
-        return $this->username;
+        return (string) $this->username;
     }
 
     public function setUsername(string $username): self
@@ -118,6 +129,59 @@ class User
         $this->username = $username;
 
         return $this;
+    }
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * Returning a salt is only needed, if you are not using a modern
+     * hashing algorithm (e.g. bcrypt or sodium) in your security.yaml.
+     *
+     * @see UserInterface
+     */
+    public function getSalt(): ?string
+    {
+        return null;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials()
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
     }
 
     public function getNom(): ?string
@@ -140,18 +204,6 @@ class User
     public function setPrenom(string $prenom): self
     {
         $this->prenom = $prenom;
-
-        return $this;
-    }
-
-    public function getMdp(): ?string
-    {
-        return $this->mdp;
-    }
-
-    public function setMdp(string $mdp): self
-    {
-        $this->mdp = $mdp;
 
         return $this;
     }
@@ -204,18 +256,6 @@ class User
         return $this;
     }
 
-    public function getRole(): ?Role
-    {
-        return $this->role;
-    }
-
-    public function setRole(?Role $role): self
-    {
-        $this->role = $role;
-
-        return $this;
-    }
-
     /**
      * @return Collection|fiche[]
      */
@@ -247,26 +287,56 @@ class User
     }
 
     /**
-     * @return Collection|Article[]
+     * @return Collection|rendezvous[]
      */
-    public function getArticles(): Collection
+    public function getRendezvous(): Collection
     {
-        return $this->articles;
+        return $this->rendezvous;
     }
 
-    public function addArticle(Article $article): self
+    public function addRendezvou(rendezvous $rendezvou): self
     {
-        if (!$this->articles->contains($article)) {
-            $this->articles[] = $article;
+        if (!$this->rendezvous->contains($rendezvou)) {
+            $this->rendezvous[] = $rendezvou;
+            $rendezvou->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRendezvou(rendezvous $rendezvou): self
+    {
+        if ($this->rendezvous->removeElement($rendezvou)) {
+            // set the owning side to null (unless already changed)
+            if ($rendezvou->getUser() === $this) {
+                $rendezvou->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|article[]
+     */
+    public function getArticle(): Collection
+    {
+        return $this->article;
+    }
+
+    public function addArticle(article $article): self
+    {
+        if (!$this->article->contains($article)) {
+            $this->article[] = $article;
             $article->setUser($this);
         }
 
         return $this;
     }
 
-    public function removeArticle(Article $article): self
+    public function removeArticle(article $article): self
     {
-        if ($this->articles->removeElement($article)) {
+        if ($this->article->removeElement($article)) {
             // set the owning side to null (unless already changed)
             if ($article->getUser() === $this) {
                 $article->setUser(null);
@@ -276,32 +346,14 @@ class User
         return $this;
     }
 
-    /**
-     * @return Collection|Rendezvous[]
-     */
-    public function getRendezvouses(): Collection
+    public function getRole(): ?role
     {
-        return $this->rendezvouses;
+        return $this->role;
     }
 
-    public function addRendezvouse(Rendezvous $rendezvouse): self
+    public function setRole(?role $role): self
     {
-        if (!$this->rendezvouses->contains($rendezvouse)) {
-            $this->rendezvouses[] = $rendezvouse;
-            $rendezvouse->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeRendezvouse(Rendezvous $rendezvouse): self
-    {
-        if ($this->rendezvouses->removeElement($rendezvouse)) {
-            // set the owning side to null (unless already changed)
-            if ($rendezvouse->getUser() === $this) {
-                $rendezvouse->setUser(null);
-            }
-        }
+        $this->role = $role;
 
         return $this;
     }

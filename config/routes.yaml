@@ -1,3 +1,12 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
+# config/routes.yaml
+# api_load_fixture:
+#     path:       /fixture
+#     controller: App\DataFixtures::load
+#     methods:    POST
+
+# api_post_edit:
+#     path:       /api/posts/{id}
+#     controller: App\Controller\BlogApiController::edit
+#     methods:    PUT
+api_login_check:
+    path: /api/login_check

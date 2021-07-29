@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 use App\Entity\Fiche;
+use App\Entity\User;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,7 +35,7 @@ class FicheController extends AbstractController
     }
 
 
-/**
+    /**
      * @Route("/fiche/getall" , name="getallfiches")
      */
     public function getall()
@@ -48,7 +49,19 @@ class FicheController extends AbstractController
         return $this->json($data, 200);
     }
 
-
+    /**
+     * @Route("/fiche/getallbyuser/{id}" , name="getallfichesbyuser")
+     */
+    public function getallbyiduser($id)
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $fiches = $this->getDoctrine()->getManager()->getRepository(Fiche::class)->findBy(['user' => $id]);
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
+        $serializer = new Serializer([$normalizer]);
+        $data = $serializer->normalize($fiches, null, ['groups' =>
+            'fiche']);
+        return $this->json($data, 200);
+    }
 
     /**
      * @Route("/fiche/delete/{id}", name="delete_fiche", methods={"POST"})
@@ -61,7 +74,6 @@ class FicheController extends AbstractController
         return $this->json('success remove',200);
     }
 
-
     /**
      * @Route("/fiche/add", name="add-fiche", methods={"POST"})
      */
@@ -70,8 +82,11 @@ class FicheController extends AbstractController
         $fiche = new Fiche();
         $date = $request->get('date');
         $description = $request->get('description');
+        $user= $request->get('user');
+        $libelle = $this->getDoctrine()->getManager()->getRepository(User::class)->findOneBy(['id'=>$user]);
         $fiche->setDate($date);
         $fiche->setDescription($description);
+        $fiche->setUser($libelle);
         $this->entityManager->persist($fiche);
         $this->entityManager->flush();
         $message = [
@@ -81,26 +96,72 @@ class FicheController extends AbstractController
         return $this->json($message, 201);
     }
 
-
-    
-/**
+    /**
      * @Route("/fiche/edit/{id}", name="update-fiche", methods={"Post"})
      */
     public function update(Request $request, $id)
     {
         $fiche = $this->getDoctrine()->getManager()->getRepository(Fiche::class)->findOneBy(['id'=>$id]);
-        $date = $request->get('date');
+        
         $description = $request->get('description');
-        $fiche->setDate($date);
         $fiche->setDescription($description);
+        
         $this->entityManager->persist($fiche);
         $this->entityManager->flush();
         return $this->json('success',200);
     }
 
 
+    /**
+     * @Route("/fiche/getbydate/{id}&{date}" , methods={"GET"} ,name="getbydate")
+     */
+    public function getbydate($date,$id,Request $request)
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $fiches = $this->getDoctrine()->getManager()->getRepository(Fiche::class)->findBy(['user' => $id,'date'=>$date]);
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
+        $serializer = new Serializer([$normalizer]);
+        $data = $serializer->normalize($fiches, null, ['groups' =>
+            'fiche']);
+        return $this->json($data, 200);
+    }
+
+    
+
+    /**
+     * @Route("/fiche/getallfiche/{id}" , methods={"GET"} ,name="getallfiche")
+     */
+    public function getallfiche($id)
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $fiches =$this->entityManager
+        ->createQuery('SELECT count(f) FROM App\Entity\Fiche f WHERE f.user = :id')
+        ->setParameter('id', $id)
+        ->getResult();
+
+        return $this->json($fiches, 200);
+    }
+
+    /**
+     * @Route("/fiche/getallbyusers/{id}&{page}" , name="getallfichesbyuser")
+     */
+    public function getallbyiduserandpagination($id,$page)
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $fiches =$this->entityManager
+        ->createQuery('SELECT f FROM App\Entity\Fiche f WHERE f.user = :id')
+        ->setParameter('id', $id)
+        ->setMaxResults(5)
+        ->setFirstResult($page*5)
+        ->getResult();
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
+        $serializer = new Serializer([$normalizer]);
+        $data = $serializer->normalize($fiches, null, ['groups' =>
+            'fiche']);
 
 
+        return $this->json($data, 200);
+    }
 
 
 

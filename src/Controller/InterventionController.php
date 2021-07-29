@@ -51,7 +51,19 @@ class InterventionController extends AbstractController
             'intervention']);
         return $this->json($data, 200);
     }
-
+/**
+     * @Route("/intervention/get/{id}" , name="getinterventionbyidfiche")
+     */
+    public function getmedicamentbyidfiche($id)
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $intervention = $this->getDoctrine()->getManager()->getRepository(Intervention::class)->findOneBy(['fiche' => $id]);
+        $normalizer = new ObjectNormalizer($classMetadataFactory);
+        $serializer = new Serializer([$normalizer]);
+        $data = $serializer->normalize($intervention, null, ['groups' =>
+            'intervention']);
+        return $this->json($data, 200);
+    }
 
 
     /**
@@ -84,6 +96,7 @@ class InterventionController extends AbstractController
         $intervention->setPrix($prix);
         $intervention->setFiche($libelle);
         $this->entityManager->persist($intervention);
+        
         $this->entityManager->flush();
         $message = [
             'satus' => 201,
@@ -102,14 +115,8 @@ class InterventionController extends AbstractController
         $intervention = $this->getDoctrine()->getManager()->getRepository(Intervention::class)->findOneBy(['id'=>$id]);
         $type= $request->get('type');
         $prix= $request->get('prix');
-        $fiche= $request->get('fiche');
-        $libelle = $this->getDoctrine()->getManager()->getRepository(Fiche::class)->findOneBy(['id'=>$fiche]);
-        if(!$libelle){
-            return $this->json('error',400);
-        }
         $intervention->setType($type);
         $intervention->setPrix($prix);
-        $intervention->setFiche($libelle);
         $this->entityManager->persist($intervention);
         $this->entityManager->flush();
         return $this->json('success',200);

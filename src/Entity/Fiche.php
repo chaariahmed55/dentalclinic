@@ -48,9 +48,10 @@ class Fiche
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="fiche")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"fiche"})
+     * @Groups({"fiche","medicament","intervention"})
      */
     private $user;
+
 
     public function __construct()
     {
@@ -158,4 +159,6 @@ class Fiche
 
         return $this;
     }
+
+    
 }
